@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+client/node_modules/
+
+# Build folder
+build/
+client/build/
+
+# Environment variables
+.env
+
+# Mac system files
+.DS_Store
+
+# Custom files
+hash.js
+README.md
