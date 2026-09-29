@@ -43,7 +43,7 @@ function App() {
 
     const socketUrl = window.location.hostname === "localhost" 
       ? "http://localhost:8080" 
-      : window.location.origin;
+      : "https://fusion-social-media-platform.onrender.com";
 
     const socket = io(socketUrl, { 
       transports: ['websocket'],
