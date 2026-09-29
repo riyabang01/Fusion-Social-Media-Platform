@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Schema } = mongoose;
+const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
@@ -28,8 +28,7 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String,
-      default:
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png",
+      default: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png",
     },
     role: {
       type: String,
@@ -80,5 +79,4 @@ const userSchema = new Schema(
   }
 );
 
-
-module.exports = mongoose.model('user',userSchema);
+module.exports = mongoose.model('user', userSchema);

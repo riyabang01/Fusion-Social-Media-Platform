@@ -2,35 +2,34 @@ const router = require("express").Router();
 const auth = require("../middleware/auth");
 const postCtrl = require("../controllers/postCtrl");
 
-// Posts routes
+
+router.use((req, res, next) => {
+  console.log(`[POST ROUTER HIT]: Method=${req.method} | URL=${req.url}`);
+  next();
+});
+
 router.route("/posts")
-  .post(auth, postCtrl.createPost) // Create a post
-  .get(auth, postCtrl.getPosts);   // Get all posts
+  .post(auth, postCtrl.createPost)
+  .get((req, res, next) => {
+    console.log("[POST ROUTER]: Reached GET /posts BEFORE auth middleware");
+    next();
+  }, auth, (req, res, next) => {
+    console.log("[POST ROUTER]: Passed auth middleware successfully!");
+    next();
+  }, postCtrl.getPosts);
 
-// Single post routes
 router.route("/post/:id")
-  .get(auth, postCtrl.getPost)        // Get a single post by id
-  .patch(auth, postCtrl.updatePost)   // Update a post
-  .delete(auth, postCtrl.deletePost); // Delete a post
+  .get(auth, postCtrl.getPost)
+  .patch(auth, postCtrl.updatePost)
+  .delete(auth, postCtrl.deletePost);
 
-// Like/Unlike a post
 router.patch("/post/:id/like", auth, postCtrl.likePost);
 router.patch("/post/:id/unlike", auth, postCtrl.unLikePost);
-
-// Report a post
 router.patch("/post/:id/report", auth, postCtrl.reportPost);
-
-// User specific posts
 router.get("/user_posts/:id", auth, postCtrl.getUserPosts);
-
-// Discover posts
 router.get("/post_discover", auth, postCtrl.getPostDiscover);
-
-// Save / Unsave posts
 router.patch("/savePost/:id", auth, postCtrl.savePost);
 router.patch("/unSavePost/:id", auth, postCtrl.unSavePost);
-
-// Get all saved posts
 router.get("/getSavePosts", auth, postCtrl.getSavePost);
 
 module.exports = router;

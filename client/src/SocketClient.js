@@ -30,18 +30,18 @@ const spawnNotification = (body, icon, url, title) => {
 };
 
 const SocketClient = () => {
-  const { auth, socket, notify } = useSelector((state) => state);
+  const { auth, socket: rawSocket, notify } = useSelector((state) => state);
   const dispatch = useDispatch();
   const audioRef = useRef();
 
-  // Join user/admin
+  const socket = rawSocket && typeof rawSocket.emit === 'function' ? rawSocket : null;
+
   useEffect(() => {
     if (!socket || !auth.user) return;
     if (auth.user.role === "user") socket.emit("joinUser", auth.user._id);
     if (auth.user.role === "admin") socket.emit("joinAdmin", auth.user._id);
   }, [socket, auth.user]);
 
-  // Active users (admin)
   useEffect(() => {
     if (!socket) return;
     const handleActiveUsers = (totalActiveUsers) => {
@@ -51,7 +51,6 @@ const SocketClient = () => {
     return () => socket.off("getActiveUsersToClient", handleActiveUsers);
   }, [socket, dispatch]);
 
-  // Likes/Unlikes
   useEffect(() => {
     if (!socket) return;
     const updatePost = (newPost) => dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
@@ -65,7 +64,6 @@ const SocketClient = () => {
     };
   }, [socket, dispatch]);
 
-  // Comments
   useEffect(() => {
     if (!socket) return;
     const updatePost = (newPost) => dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
@@ -79,7 +77,6 @@ const SocketClient = () => {
     };
   }, [socket, dispatch]);
 
-  // Follow/Unfollow
   useEffect(() => {
     if (!socket) return;
     const followHandler = (newUser) => dispatch({ type: GLOBALTYPES.AUTH, payload: { ...auth, user: newUser } });
@@ -93,7 +90,6 @@ const SocketClient = () => {
     };
   }, [socket, dispatch, auth]);
 
-  // Notifications
   useEffect(() => {
     if (!socket) return;
 
@@ -116,7 +112,6 @@ const SocketClient = () => {
     };
   }, [socket, dispatch, notify.sound]);
 
-  // Messages
   useEffect(() => {
     if (!socket) return;
 

@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-
 import auth from './authReducer';
 import userType from './userTypeReducer';
 import alert from './alertReducer';

@@ -72,16 +72,16 @@ const StatusModal = () => {
   };
 
   const handleStopStream = () => {
-    tracks.stop();
+    if (tracks) tracks.stop();
     setStream(false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (images.length === 0) {
+    if (images.length === 0 && !content.trim()) {
       return dispatch({
         type: GLOBALTYPES.ALERT,
-        payload: { error: "Add image(s)." },
+        payload: { error: "Please add some text content or image(s)." },
       });
     }
 
@@ -109,14 +109,14 @@ const StatusModal = () => {
     }
   }, [status]);
 
-  
-
   return (
-    <div className="status_modal">
-      <form onSubmit={handleSubmit}>
-        <div className="status_header">
-          <h5 className="m-0">Create Post</h5>
+    <div className="status_modal" style={{ background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)" }}>
+      <form onSubmit={handleSubmit} className="border-0 shadow-lg bg-white rounded-4 overflow-hidden">
+        <div className="status_header d-flex justify-content-between align-items-center px-4 py-3 border-bottom border-light-subtle bg-white">
+          <h5 className="m-0 fw-bold text-dark fs-5">{status.onEdit ? "Update Post" : "Create Post"}</h5>
           <span
+            className="fs-4 text-secondary cursor-pointer close_modal_btn"
+            style={{ cursor: "pointer", userSelect: "none", lineHeight: "1" }}
             onClick={() =>
               dispatch({ type: GLOBALTYPES.STATUS, payload: false })
             }
@@ -124,27 +124,33 @@ const StatusModal = () => {
             &times;
           </span>
         </div>
-        <div className="status_body">
+        
+        <div className="status_body p-4 bg-white">
           <textarea
             onChange={(e) => setContent(e.target.value)}
             value={content}
             name="content"
-            placeholder={`${auth.user.username}, What's on your mind?`}
+            placeholder={`${auth?.user?.username || 'Creator'}, what's on your mind today?`}
+            className="form-control border-0 px-0 fs-6 text-dark"
             style={{
               filter: theme ? "invert(1)" : "invert(0)",
-              color: theme ? "white" : "#111",
-              background: theme ? "rgb(0,0,0,0.3)" : "",
+              color: theme ? "white" : "#1e293b",
+              background: "transparent",
+              resize: "none",
+              minHeight: "140px",
+              outline: "none",
+              boxShadow: "none"
             }}
           />
 
-          <div className="d-flex">
-            <div className="flex-fill"></div>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <small className="text-muted small fw-medium">{content.length} characters</small>
             <Icons setContent={setContent} content={content} theme={theme} />
           </div>
 
-          <div className="show_images">
+          <div className="show_images d-flex flex-wrap gap-2 my-2 overflow-x-auto py-1">
             {images.map((img, index) => (
-              <div key={index} className="file_img">
+              <div key={index} className="file_img position-relative border border-light-subtle rounded-3 overflow-hidden shadow-sm bg-light" style={{ width: "90px", height: "90px" }}>
                 {img.camera ? (
                   imageShow(img.camera, theme)
                 ) : img.url ? (
@@ -160,35 +166,58 @@ const StatusModal = () => {
                       : imageShow(URL.createObjectURL(img, theme))}
                   </>
                 )}
-                <span onClick={() => deleteImages(index)}>&times;</span>
+                <span 
+                  onClick={() => deleteImages(index)}
+                  className="position-absolute top-1 end-1 bg-dark bg-opacity-70 text-white rounded-circle d-flex align-items-center justify-content-center cursor-pointer shadow-sm fw-bold"
+                  style={{ width: "18px", height: "18px", fontSize: "0.75rem", right: "4px", top: "4px", cursor: "pointer" }}
+                >
+                  &times;
+                </span>
               </div>
             ))}
           </div>
 
           {stream && (
-            <div className="stream position-relative">
+            <div className="stream position-relative border border-light-subtle rounded-4 overflow-hidden mb-3 bg-dark ratio ratio-16x9">
               <video
-                width="100%"
-                height="100%"
                 ref={videoRef}
-                style={{ filter: theme ? "invert(1)" : "invert(0)" }}
+                style={{ filter: theme ? "invert(1)" : "invert(0)", objectFit: "cover" }}
                 autoPlay
                 muted
+                className="w-100 h-100"
               />
-
-              <span onClick={handleStopStream}>&times;</span>
+              <span 
+                onClick={handleStopStream}
+                className="position-absolute bg-danger text-white rounded-circle d-flex align-items-center justify-content-center cursor-pointer shadow-lg"
+                style={{ width: "28px", height: "28px", right: "12px", top: "12px", cursor: "pointer", fontSize: "1.2rem", fontWeight: "300" }}
+              >
+                &times;
+              </span>
               <canvas style={{ display: "none" }} ref={refCanvas} />
             </div>
           )}
 
-          <div className="input_images">
+          <div className="input_images border-top border-light-subtle pt-3 mt-2 d-flex justify-content-start gap-3">
             {stream ? (
-              <i className="fas fa-camera" onClick={handleCapture} />
+              <button 
+                type="button" 
+                className="btn btn-sm btn-outline-dark d-flex align-items-center gap-2 px-3 py-2 rounded-3 fw-medium"
+                onClick={handleCapture}
+              >
+                <i className="fas fa-camera text-primary" /> Capture Media
+              </button>
             ) : (
               <>
-                <i className="fas fa-camera" onClick={handleStream} />
-                <div className="file_upload">
-                  <i className="fas fa-image" />
+                <button 
+                  type="button" 
+                  className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 rounded-3 fw-medium text-secondary"
+                  onClick={handleStream}
+                >
+                  <i className="fas fa-video text-danger" /> Use Webcam
+                </button>
+                
+                <div className="file_upload position-relative btn btn-sm btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 rounded-3 fw-medium text-secondary overflow-hidden">
+                  <i className="fas fa-image text-success" /> Attach Media
                   <input
                     onChange={handleChangeImages}
                     type="file"
@@ -196,15 +225,17 @@ const StatusModal = () => {
                     id="file"
                     multiple
                     accept="image/*,video/*"
+                    style={{ position: "absolute", left: 0, top: 0, opacity: 0, cursor: "pointer", width: "100%", height: "100%" }}
                   />
                 </div>
               </>
             )}
           </div>
         </div>
-        <div className="status_footer">
-          <button type="submit" className="btn btn-primary w-100">
-            Post
+        
+        <div className="status_footer p-4 border-top border-light-subtle bg-light-subtle d-flex justify-content-end">
+          <button type="submit" className="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm text-uppercase tracking-wider fs-7" style={{ minWidth: "120px" }}>
+            {status.onEdit ? "Update content" : "Publish Post"}
           </button>
         </div>
       </form>

@@ -1,102 +1,57 @@
-/* #region status */
-.status{
-    background-color: transparent;
-    /* box-shadow: 0 0 5px #ddd; */
-    padding: 20px 0;
-    /* border-radius: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.125); */
+.posts-container {
+    width: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.status .statusBtn{
-    border-radius: 27px;
-    padding: 0 10px;
-    text-align: left;
-    margin: 0 5px;
-    margin-left: 3px;
-    font-size: 1.3rem;
+.hover-in-shadow {
+    transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
-
-
-/* #endregion */
-
-
-/* #region Posts */
-.posts .card{
-    /* box-shadow: 0 0 5px #ddd; */
+.hover-in-shadow:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* #endregion */
-
-/* #region Post card's header */
-.posts .card_header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 15px 25px;
+.hover-scale {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.posts .card_header .card_name{
-    transform: translateY(3px);
+.hover-scale:hover {
+    transform: scale(1.12);
 }
 
-.posts .card_header .dropdown-menu{
-    position: absolute;
-    left: inherit !important;
-    right: 0 ;
-
+.transition-all {
+    transition: all 0.2s ease-in-out;
 }
 
-.posts .card_header .dropdown-item{
-    display: flex;
-    margin: 5px 0;
+.hover-text-primary:hover {
+    color: #0d6efd !important;
 }
 
-.posts .card_header .dropdown-item:hover{
-    background: var(--pink);
+.hover-text-success:hover {
+    color: #198754 !important;
 }
 
-.posts .card_header #moreLink{
-    color: var(--c1);
+.hover-text-danger:hover {
+    color: #dc3545 !important;
 }
 
-/* #endregion */
-
-
-/* #region Post card's body */
-.posts .card_body-content{
-    padding: 0 25px;
-    margin-top: -10px;
-    margin-bottom: 10px;
-
+.text-dark-hover {
+    transition: color 0.15s ease-in-out;
 }
 
-.posts .card_body-content .readMore{
-    color: crimson;
-    cursor: pointer;
+.text-dark-hover:hover {
+    color: #1e293b !important;
 }
 
-/* #endregion  */
-
-/* #region Post card's footer */
-.posts .card_icon_menu{
-    display: flex;
-    justify-content: space-between;
-    padding: 0 15px;
-    cursor: pointer;
+.dropdown-item {
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
-.posts .card_icon_menu i{
-    font-size: 28px;
-    margin: 10px;
+.dropdown-item:hover {
+    background-color: #f8fafc !important;
 }
 
-.posts .card_icon_menu img{
-    width: 28px;
-    height: 28px;
-    transform: translate(5px, 10px);
-    opacity: 0.9;
+.dropdown-item.text-danger:hover {
+    background-color: #fff5f5 !important;
 }
-/* #endregion  */
-

@@ -1,24 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { adminLogin, login } from "../redux/actions/authAction";
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import { login } from '../redux/actions/authAction';
 
 const Login = () => {
+  const { auth, alert } = useSelector(state => state);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const initialState = { email: "", password: "" };
   const [userData, setUserData] = useState(initialState);
-  const [userType, setUserType] = useState(false);
   const { email, password } = userData;
 
   const [typePass, setTypePass] = useState(false);
 
-  const { auth } = useSelector((state) => state);
-
-  const dispatch = useDispatch();
-  const history = useHistory();
-
   useEffect(() => {
-    if (auth.token) history.push("/");
-  }, [auth.token, history]);
+    if (auth.token) navigate("/");
+  }, [auth.token, navigate]);
 
   const handleChangeInput = (e) => {
     const { name, value } = e.target;
@@ -27,85 +25,79 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!userType) dispatch(login(userData));
-    else dispatch(adminLogin(userData));
+    dispatch(login(userData));
   };
 
   return (
-    <div className="auth_page">
-      <form onSubmit={handleSubmit}>
-        <h2 className="text-center fw-bold auth-heading">FUSION</h2>
+    <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+      <div className="card shadow-lg border-0 p-4" style={{ width: "100%", maxWidth: "420px", borderRadius: "15px" }}>
+        <form onSubmit={handleSubmit} className="needs-validation">
+          <h2 className="text-center fw-bold mb-4 text-primary tracking-wide">FUSION</h2>
 
-        <div className="mb-3">
-          <label className="form-label fw-semibold">Email Address</label>
-          <div className="form-input-wrap p-2 outer-shadow">
-            <input
-              type="email"
-              className="w-100"
-              onChange={handleChangeInput}
-              value={email}
-              name="email"
-              required
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label fw-semibold text-secondary">Email address</label>
+            <input 
+              type="email" 
+              className={`form-control py-2 ${alert.email ? 'is-invalid' : ''}`}
+              id="email" 
+              onChange={handleChangeInput} 
+              value={email} 
+              name="email" 
+              placeholder="name@example.com"
+              style={{ background: alert.email ? "#fd2d6a14" : "" }}
             />
+            {alert.email && (
+              <div className="invalid-feedback">
+                {alert.email}
+              </div>
+            )}
           </div>
-        </div>
 
-        <div className="mb-3 pass">
-          <label className="form-label fw-semibold">Password</label>
-          <div className="form-input-wrap p-2 outer-shadow">
-            <input
-              type={typePass ? "text" : "password"}
-              className="w-100"
-              onChange={handleChangeInput}
-              value={password}
-              name="password"
-              required
-            />
-            <small onClick={() => setTypePass(!typePass)}>
-              {typePass ? "Hide" : "Show"}
-            </small>
+          <div className="mb-4">
+            <label htmlFor="password" className="form-label fw-semibold text-secondary">Password</label>
+            <div className="input-group">
+              <input 
+                type={typePass ? "text" : "password"} 
+                className={`form-control py-2 ${alert.password ? 'is-invalid' : ''}`}
+                id="password" 
+                onChange={handleChangeInput} 
+                value={password} 
+                name="password" 
+                placeholder="••••••••"
+                style={{ background: alert.password ? "#fd2d6a14" : "" }}
+              />
+              <button 
+                type="button" 
+                className="btn btn-outline-secondary px-3" 
+                onClick={() => setTypePass(!typePass)}
+              >
+                {typePass ? "Hide" : "Show"}
+              </button>
+              {alert.password && (
+                <div className="invalid-feedback d-block">
+                  {alert.password}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="d-flex justify-content-evenly mx-0 mb-3">
-          <label>
-            User:
-            <input
-              type="radio"
-              name="role"
-              defaultChecked
-              onClick={() => setUserType(false)}
-              className="ms-1"
-            />
-          </label>
-          <label>
-            Admin:
-            <input
-              type="radio"
-              name="role"
-              onClick={() => setUserType(true)}
-              className="ms-1"
-            />
-          </label>
-        </div>
+          <button 
+            type="submit" 
+            className="btn btn-primary w-100 py-2 fw-bold mb-3 shadow-sm text-uppercase" 
+            disabled={!email || !password}
+            style={{ borderRadius: "8px" }}
+          >
+            Login
+          </button>
 
-        <button
-          type="submit"
-          className="auth-btn w-100 fw-bold"
-          disabled={!email || !password}
-        >
-          Login
-        </button>
-
-        <p className="text-center mt-3">
-          Don't have an account?{" "}
-          <Link to="/register" className="fw-bold text-decoration-none" style={{ color: "var(--violet)" }}>
-            Register Now
-          </Link>
-        </p>
-      </form>
+          <p className="text-center text-muted mb-0 small">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-primary fw-semibold text-decoration-none">Register Now.</Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
-};
+}
 
 export default Login;

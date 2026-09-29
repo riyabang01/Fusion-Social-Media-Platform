@@ -25,6 +25,8 @@ const commentCtrl = {
         postId
       });
 
+      await newComment.save();
+
       await Posts.findOneAndUpdate(
         { _id: postId },
         {
@@ -33,7 +35,6 @@ const commentCtrl = {
         { new: true }
       );
 
-      await newComment.save();
       res.json({ newComment });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -57,11 +58,12 @@ const commentCtrl = {
 
   likeComment: async (req, res) => {
     try {
-      const comment = await Comments.find({
+      const isLiked = await Comments.exists({
         _id: req.params.id,
         likes: req.user._id,
       });
-      if (comment.length > 0) {
+      
+      if (isLiked) {
         return res
           .status(400)
           .json({ msg: "You have already liked this post" });
@@ -111,11 +113,15 @@ const commentCtrl = {
         ]
       });
 
+      if (!comment) {
+        return res.status(400).json({ msg: "Comment not found or unauthorized access." });
+      }
+
       await Posts.findOneAndUpdate({_id: comment.postId}, {
         $pull: {comments: req.params.id}
       });
-      res.json({msg: "Comment deleted successfully."});
       
+      res.json({msg: "Comment deleted successfully."});
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

@@ -1,12 +1,14 @@
 const Notifies = require('../models/notifyModel');
 
-
 const notifyCtrl = {
   createNotify: async (req, res) => {
     try {
       const { id, recipients, url, text, content, image } = req.body;
 
-      if (recipients.includes(req.user._id.toString())) return;
+      const userIdStr = req.user._id.toString();
+      if (Array.isArray(recipients) && recipients.map(r => r.toString()).includes(userIdStr)) {
+        return res.status(400).json({ msg: "Action context overrides recipient parameters loop." });
+      }
 
       const notify = new Notifies({
         id,
@@ -53,9 +55,8 @@ const notifyCtrl = {
     try {
       const notifies = await Notifies.findOneAndUpdate(
         { _id: req.params.id },
-        {
-          isRead: true,
-        }
+        { isRead: true },
+        { new: true }
       );
 
       return res.json({ notifies });
@@ -66,9 +67,8 @@ const notifyCtrl = {
 
   deleteAllNotifies: async (req, res) => {
     try {
-      const notifies = await Notifies.deleteMany({ recipients: req.user._id });
-
-      return res.json({ notifies });
+      await Notifies.deleteMany({ recipients: req.user._id });
+      return res.json({ msg: "All system notifications purged successfully." });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

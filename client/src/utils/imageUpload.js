@@ -1,44 +1,49 @@
 export const checkImage = (file) => {
-    let err = "";
-    if(!file){
-        return err = "File does not exist.";
-    }
-//?1 mb
-    if(file.size > 1024 * 1024){
-         return (err = "File size must be less than 1 Mb.");
-    }
+  if (!file) return "File does not exist.";
+  
+  
+  if (file.size > 1024 * 1024 * 5) {
+    return "File size must be less than 5 MB.";
+  }
 
-    if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
-      return (err = "Image must be jpeg or png.");
-    }
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'];
+  if (!validTypes.includes(file.type)) {
+    return "Supported formats are JPEG, PNG, WebP, and MP4.";
+  }
 
-    return err;
-}
+  return "";
+};
 
 export const imageUpload = async (images) => {
-    let imgArr = [];
-    for(const item of images){
-        const formData = new FormData();
+  const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+  
 
-        if(item.camera){
-            formData.append("file", item.camera);
-        }else{
-            formData.append("file", item);  
-        }
+  const uploadUrl = "https://api.cloudinary.com/v1_1/" + cloudName + "/upload";
 
-        
-        formData.append("upload_preset", "ADD VALUE HERE");
-        formData.append("cloud_name", "ADD VALUE HERE");
+  const uploadPromises = images.map(async (item) => {
+    const formData = new FormData();
+    const fileToUpload = item.camera ? item.camera : (item.path || item.buffer || item);
+    
+    formData.append("file", fileToUpload);
+    formData.append("upload_preset", uploadPreset);
 
-        const res = await fetch("ADD CLOUDINARY IMAGE UPLOAD LINK HERE", {
-            method: "POST",
-            body: formData
-        })
+    const res = await fetch(uploadUrl, {
+      method: "POST",
+      body: formData,
+    });
 
-        const data = await res.json();
-        imgArr.push({ public_id: data.public_id, url: data.secure_url });
-        
-      
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error?.message || "Upload failed with status code " + res.status);
     }
-    return imgArr;
-}
+
+    const data = await res.json();
+    return {
+      public_id: data.public_id,
+      url: data.secure_url,
+    };
+  });
+
+  return Promise.all(uploadPromises);
+};

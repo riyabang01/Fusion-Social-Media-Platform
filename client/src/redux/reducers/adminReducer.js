@@ -8,10 +8,11 @@ const initialState = {
     total_likes: 0,
     total_active_users: 0,
     total_spam_posts: 0,
-    spam_posts : []
+    spam_posts : [],
+    loading: false
 };
 
-const authReducer = (state = initialState, action) => {
+const adminReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADMIN_TYPES.GET_TOTAL_USERS:
       return {
@@ -60,6 +61,7 @@ const authReducer = (state = initialState, action) => {
         ...state,
         spam_posts: [...action.payload],
       };
+      
     case ADMIN_TYPES.DELETE_POST:
       return {
         ...state,
@@ -71,4 +73,4 @@ const authReducer = (state = initialState, action) => {
   }
 };
 
-export default authReducer;
+export default adminReducer;

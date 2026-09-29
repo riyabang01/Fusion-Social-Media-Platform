@@ -31,20 +31,25 @@ const Posts = ({ auth, profile, dispatch, id }) => {
     dispatch({ type: PROFILE_TYPES.UPDATE_POST, payload: newData });
     setLoad(false);
   };
+
   return (
-    <div>
+    <div className="profile_posts_wrapper p-3 p-md-4 bg-white border border-light-subtle rounded-4 shadow-sm">
       <PostThumb posts={posts} result={result} />
 
       {load && (
-        <img src={LoadIcon} alt="Loading..." className="d-block mx-auto" />
+        <div className="d-flex justify-content-center my-4">
+          <img src={LoadIcon} alt="Loading..." width="40" />
+        </div>
       )}
 
-      <LoadMoreBtn
-        result={result}
-        page={page}
-        load={load}
-        handleLoadMore={handleLoadMore}
-      />
+      <div className="d-flex justify-content-center mt-3">
+        <LoadMoreBtn
+          result={result}
+          page={page}
+          load={load}
+          handleLoadMore={handleLoadMore}
+        />
+      </div>
     </div>
   );
 };

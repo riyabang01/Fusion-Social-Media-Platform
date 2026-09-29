@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-
 const postSchema = new Schema(
   {
     content: String,
@@ -34,8 +33,9 @@ const postSchema = new Schema(
   },
   {
     timestamps: true,
+    
+    strictPopulate: false 
   }
 );
-
 
 module.exports = mongoose.model('post', postSchema);

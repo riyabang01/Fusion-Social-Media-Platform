@@ -1,90 +1,116 @@
-let users = [];
-let admins = [];
+
+let users = new Map();  
+let admins = new Map(); 
 
 const SocketServer = (socket) => {
-
-  //#region //!Connection
-  socket.on("joinUser", (id) => {
-    // Avoid duplicates
-    if (!users.find(user => user.id === id)) {
-      users.push({ id, socketId: socket.id });
+  
+ 
+  const addClient = (map, id, socketId) => {
+    if (!map.has(id)) {
+      map.set(id, new Set());
     }
+    map.get(id).add(socketId);
+  };
+
+ 
+  const removeClient = (map, socketId) => {
+    for (let [id, socketIds] of map.entries()) {
+      if (socketIds.has(socketId)) {
+        socketIds.delete(socketId);
+        if (socketIds.size === 0) {
+          map.delete(id);
+        }
+        break;
+      }
+    }
+  };
+
+  
+  const getSocketIdsByUsers = (userIds) => {
+    let socketIds = [];
+    userIds.forEach(id => {
+      if (users.has(id)) {
+        socketIds.push(...users.get(id));
+      }
+    });
+    return socketIds;
+  };
+
+  
+
+  socket.on("joinUser", (id) => {
+    addClient(users, id, socket.id);
   });
 
   socket.on("joinAdmin", (id) => {
-    if (!admins.find(admin => admin.id === id)) {
-      admins.push({ id, socketId: socket.id });
-    }
-
-    const admin = admins.find((admin) => admin.id === id);
-    if (admin) {
-      const totalActiveUsers = users.length;
-      socket.emit("activeUsers", totalActiveUsers);
-    }
+    addClient(admins, id, socket.id);
+    
+    socket.emit("activeUsers", users.size);
   });
 
   socket.on("disconnect", () => {
-    users = users.filter((user) => user.socketId !== socket.id);
-    admins = admins.filter((admin) => admin.socketId !== socket.id);
+    removeClient(users, socket.id);
+    removeClient(admins, socket.id);
   });
-  //#endregion
 
-  //#region //!Like
+
+
   const notifyFollowers = (eventName, newPost) => {
-    const ids = [...newPost.user.followers, newPost.user._id];
-    const clients = users.filter((user) => ids.includes(user.id));
-    clients.forEach((client) => {
-      socket.to(client.socketId).emit(eventName, newPost);
+    if (!newPost || !newPost.user) return;
+    const followersList = newPost.user.followers || [];
+    const ids = [...followersList, newPost.user._id];
+    
+    const targetSockets = getSocketIdsByUsers(ids);
+    targetSockets.forEach((socketId) => {
+      socket.to(socketId).emit(eventName, newPost);
     });
   };
 
   socket.on("likePost", (newPost) => notifyFollowers("likeToClient", newPost));
   socket.on("unLikePost", (newPost) => notifyFollowers("unLikeToClient", newPost));
-  //#endregion
-
-  //#region //!Comment
   socket.on("createComment", (newPost) => notifyFollowers("createCommentToClient", newPost));
   socket.on("deleteComment", (newPost) => notifyFollowers("deleteCommentToClient", newPost));
-  //#endregion
 
-  //#region //!Follow
   socket.on("follow", (newUser) => {
-    const user = users.find((user) => user.id === newUser._id);
-    user && socket.to(user.socketId).emit("followToClient", newUser);
+    if (!newUser || !users.has(newUser._id)) return;
+    users.get(newUser._id).forEach(socketId => {
+      socket.to(socketId).emit("followToClient", newUser);
+    });
   });
 
   socket.on("unFollow", (newUser) => {
-    const user = users.find((user) => user.id === newUser._id);
-    user && socket.to(user.socketId).emit("unFollowToClient", newUser);
+    if (!newUser || !users.has(newUser._id)) return;
+    users.get(newUser._id).forEach(socketId => {
+      socket.to(socketId).emit("unFollowToClient", newUser);
+    });
   });
-  //#endregion
 
-  //#region //!Notifications
   const notifyRecipients = (eventName, msg) => {
-    const clients = users.filter(user => msg.recipients.includes(user.id));
-    clients.forEach(client => socket.to(client.socketId).emit(eventName, msg));
+    if (!msg || !msg.recipients) return;
+    const targetSockets = getSocketIdsByUsers(msg.recipients);
+    targetSockets.forEach(socketId => {
+      socket.to(socketId).emit(eventName, msg);
+    });
   };
 
   socket.on("createNotify", (msg) => notifyRecipients("createNotifyToClient", msg));
   socket.on("removeNotify", (msg) => notifyRecipients("removeNotifyToClient", msg));
-  //#endregion
 
-  //#region //!Active Users for Admin
+
+
   socket.on("getActiveUsers", (id) => {
-    const admin = admins.find((admin) => admin.id === id);
-    if (admin) {
-      const totalActiveUsers = users.length;
-      socket.to(admin.socketId).emit("getActiveUsersToClient", totalActiveUsers);
+    
+    if (admins.has(id)) {
+      socket.emit("getActiveUsersToClient", users.size);
     }
   });
-  //#endregion
 
-  //#region //!Messages
   socket.on("addMessage", (msg) => {
-    const user = users.find(u => u.id === msg.recipient);
-    user && socket.to(user.socketId).emit("addMessageToClient", msg);
+    if (!msg || !users.has(msg.recipient)) return;
+    users.get(msg.recipient).forEach(socketId => {
+      socket.to(socketId).emit("addMessageToClient", msg);
+    });
   });
-  //#endregion
 };
 
 module.exports = SocketServer;

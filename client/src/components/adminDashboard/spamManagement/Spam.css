@@ -1,36 +1,39 @@
-.spam{
+.spam_queue_wrapper {
     width: 100%;
-    background: white;
-    max-width: 800px;
-    height: 78vh;
+    max-width: 900px;
     margin: 0 auto;
-    border-radius: 10px;
-    border: 2px solid var(--c1);
-    padding: 3px;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    padding: 1.25rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.admin_content_display{
-    width: 100%;
-    display: flex;
-    background: #eff0f4;
-    margin: 4px 0;
-    border-radius: 5px;
-}
-.spam .spam_report{
-    font-size: 1.3rem;
-    font-weight: 500;
-    margin: 0 9px;
-}
-.spam .spam_time{
-    font-size: 1rem;
-    margin-left: 10px
-}
-.spam .spam_username{
-    font-size: 1.3rem;
-    font-weight: 500;
+.admin_content_list .d-flex {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.spam .spam_email{
-    font-size: 1rem;
-    color: var(--c1);
+.admin_content_list .d-flex:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.spam_queue_wrapper ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.spam_queue_wrapper ::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.spam_queue_wrapper ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 8px;
+}
+
+.spam_queue_wrapper ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }

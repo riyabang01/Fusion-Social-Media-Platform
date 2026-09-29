@@ -40,22 +40,22 @@ const RightSide = () => {
 
     const handleChangeMedia = (e) => {
       const files = [...e.target.files];
-    let err = "";
-    let newMedia = [];
+      let err = "";
+      let newMedia = [];
 
-    files.forEach((file) => {
-      if (!file) {
-        return (err = "File does not exist.");
+      files.forEach((file) => {
+        if (!file) {
+          return (err = "File does not exist.");
+        }
+        if (file.size > 1024 * 1024 * 5) {
+          return (err = "Image size must be less than 5 mb.");
+        }
+        return newMedia.push(file);
+      });
+      if (err) {
+        dispatch({ type: GLOBALTYPES.ALERT, payload: { error: err } });
       }
-      if (file.size > 1024 * 1024 * 5) {
-        return (err = "Image size must be less than 5 mb.");
-      }
-      return newMedia.push(file);
-    });
-    if (err) {
-      dispatch({ type: GLOBALTYPES.ALERT, payload: { error: err } });
-    }
-    setMedia([...media, ...newMedia]);
+      setMedia([...media, ...newMedia]);
     };
 
     const handleDeleteMedia = (index) => {
@@ -86,7 +86,7 @@ const RightSide = () => {
       await dispatch(addMessage({msg, auth, socket}));
       if (refDisplay.current) {
         refDisplay.current.scrollIntoView({
-          behaviour: "smooth",
+          behavior: "smooth",
           block: "end",
         });
       }
@@ -95,21 +95,16 @@ const RightSide = () => {
     useEffect(() => {
       if (id) {
         const getMessagesData = async () => {
-
           dispatch({type: MESSAGE_TYPES.GET_MESSAGES, payload: { messages: [] } });
-          
           setPage(1);
           await dispatch(getMessages({ auth, id }));
           if(refDisplay.current){
-            refDisplay.current.scrollIntoView({behaviour: 'smooth', block: 'end'});
+            refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'});
           }
         };
-
         getMessagesData();
       }
     }, [id, dispatch, auth]);
-
-    // load more
 
     useEffect(() => {
       const observer = new IntersectionObserver(
@@ -122,7 +117,8 @@ const RightSide = () => {
           threshold: 0.1,
         }
       );
-      observer.observe(pageEnd.current);
+      if (pageEnd.current) observer.observe(pageEnd.current);
+      return () => observer.disconnect();
     }, [setPage]);
 
     useEffect(() => {
@@ -134,7 +130,7 @@ const RightSide = () => {
     useEffect(() => {
       if (refDisplay.current) {
         refDisplay.current.scrollIntoView({
-          behaviour: "smooth",
+          behavior: "smooth",
           block: "end",
         });
       }
@@ -225,4 +221,4 @@ const RightSide = () => {
     );
 }
 
-export default RightSide
+export default RightSide;

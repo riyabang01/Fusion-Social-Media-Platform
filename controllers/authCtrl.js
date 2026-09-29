@@ -38,7 +38,7 @@ const authCtrl = {
 
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
-        path: "/api/refresh_token",
+        path: "/",
         sameSite: "lax",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
@@ -74,7 +74,6 @@ const authCtrl = {
       await Users.findByIdAndUpdate(req.user._id, { password: newPasswordHash });
 
       res.json({ msg: "Password updated successfully." });
-
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -82,7 +81,6 @@ const authCtrl = {
 
   registerAdmin: async (req, res) => {
     try {
-      // Only Admin can create Admin
       if (req.user.role !== "admin")
         return res.status(403).json({ msg: "Access Denied! Admin only." });
 
@@ -113,7 +111,6 @@ const authCtrl = {
 
       await newAdmin.save();
       res.json({ msg: "Admin Registered Successfully!" });
-
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -123,7 +120,7 @@ const authCtrl = {
     try {
       const { email, password } = req.body;
 
-      const user = await Users.findOne({ email, role: "user" })
+      const user = await Users.findOne({ email })
         .populate("followers following", "-password");
 
       if (!user)
@@ -138,7 +135,7 @@ const authCtrl = {
 
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
-        path: "/api/refresh_token",
+        path: "/",
         sameSite: "lax",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
@@ -173,7 +170,7 @@ const authCtrl = {
 
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
-        path: "/api/refresh_token",
+        path: "/",
         sameSite: "lax",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
@@ -193,7 +190,7 @@ const authCtrl = {
 
   logout: async (req, res) => {
     try {
-      res.clearCookie("refreshtoken", { path: "/api/refresh_token" });
+      res.clearCookie("refreshtoken", { path: "/" });
       return res.json({ msg: "Logged out Successfully." });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -219,7 +216,6 @@ const authCtrl = {
         const access_token = createAccessToken({ id: result.id });
         res.json({ access_token, user });
       });
-
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

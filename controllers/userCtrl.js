@@ -3,8 +3,13 @@ const Users = require("../models/userModel");
 const userCtrl = {
   searchUser: async (req, res) => {
     try {
+      const { username } = req.query;
+      if (!username) return res.json({ users: [] });
+
+      const escapedUsername = username.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+
       const users = await Users.find({
-        username: { $regex: req.query.username },
+        username: { $regex: escapedUsername, $options: "i" },
       })
         .limit(10)
         .select("fullname username avatar");
@@ -22,7 +27,7 @@ const userCtrl = {
         .populate("followers following", "-password");
 
       if (!user) {
-        return res.status(400).json({ msg: "requested user does not exist." });
+        return res.status(400).json({ msg: "Requested user does not exist." });
       }
 
       res.json({ user });
@@ -42,6 +47,7 @@ const userCtrl = {
         website,
         gender,
       } = req.body;
+      
       if (!fullname) {
         return res.status(400).json({ msg: "Please add your full name." });
       }
@@ -59,24 +65,18 @@ const userCtrl = {
 
   follow: async (req, res) => {
     try {
-      const user = await Users.find({
+      const isFollowing = await Users.exists({
         _id: req.params.id,
         followers: req.user._id,
       });
-      if (user.length > 0)
-        return res
-          .status(500)
-          .json({ msg: "You are already following this user." });
 
-
+      if (isFollowing) {
+        return res.status(400).json({ msg: "You are already following this user." });
+      }
 
       const newUser = await Users.findOneAndUpdate(
         { _id: req.params.id },
-        {
-          $push: {
-            followers: req.user._id
-          },
-        },
+        { $push: { followers: req.user._id } },
         { new: true }
       ).populate("followers following", "-password");
 
@@ -94,13 +94,9 @@ const userCtrl = {
 
   unfollow: async (req, res) => {
     try {
-      
-
       const newUser = await Users.findOneAndUpdate(
         { _id: req.params.id },
-        {
-          $pull: { followers: req.user._id }
-        },
+        { $pull: { followers: req.user._id } },
         { new: true }
       ).populate('followers following', '-password');
 
@@ -119,8 +115,8 @@ const userCtrl = {
   suggestionsUser: async (req, res) => {
     try {
       const newArr = [...req.user.following, req.user._id];
-
       const num = req.query.num || 10;
+      
       const users = await Users.aggregate([
         { $match: { _id: { $nin: newArr } } },
         { $sample: { size: Number(num) } },
@@ -140,7 +136,12 @@ const userCtrl = {
             as: "following",
           },
         },
-      ]).project("-password");
+        {
+          $project: {
+            password: 0
+          }
+        }
+      ]);
 
       return res.json({
         users,
@@ -150,9 +151,6 @@ const userCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
-
-
-
 };
 
 module.exports = userCtrl;

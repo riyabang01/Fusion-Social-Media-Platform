@@ -1,14 +1,11 @@
 const Posts = require("../models/postModel");
 const Users = require("../models/userModel");
 const Comments = require("../models/commentModel");
-const { post } = require("../routes/adminRouter");
-
 
 const adminCtrl = {
   getTotalUsers: async (req, res) => {
     try {
-      const users = await Users.find();
-      const total_users = users.length;
+      const total_users = await Users.countDocuments();
       res.json({ total_users });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -17,8 +14,7 @@ const adminCtrl = {
 
   getTotalPosts: async (req, res) => {
     try {
-      const posts = await Posts.find();
-      const total_posts = posts.length;
+      const total_posts = await Posts.countDocuments();
       res.json({ total_posts });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -27,8 +23,7 @@ const adminCtrl = {
 
   getTotalComments: async (req, res) => {
     try {
-      const comments = await Comments.find();
-      const total_comments = comments.length;
+      const total_comments = await Comments.countDocuments();
       res.json({ total_comments });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -37,9 +32,15 @@ const adminCtrl = {
 
   getTotalLikes: async (req, res) => {
     try {
-      const posts = await Posts.find();
-      let total_likes = 0;
-      await posts.map((post) => (total_likes += post.likes.length));
+      const result = await Posts.aggregate([
+        {
+          $group: {
+            _id: null,
+            total_likes: { $sum: { $size: { $ifNull: ["$likes", []] } } }
+          }
+        }
+      ]);
+      const total_likes = result.length > 0 ? result[0].total_likes : 0;
       res.json({ total_likes });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -48,10 +49,9 @@ const adminCtrl = {
 
   getTotalSpamPosts: async (req, res) => {
     try {
-      const posts = await Posts.find();
-      
-      const reportedPosts = await posts.filter(post => post.reports.length>2);
-      const total_spam_posts = reportedPosts.length;
+      const total_spam_posts = await Posts.countDocuments({
+        $expr: { $gt: [{ $size: { $ifNull: ["$reports", []] } }, 2] }
+      });
       res.json({ total_spam_posts });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -60,10 +60,11 @@ const adminCtrl = {
 
   getSpamPosts: async (req, res) => {
     try {
-      const posts = await Posts.find()
-        .select("user createdAt reports content")
-        .populate({ path: "user", select: "username avatar email" });
-      const spamPosts = posts.filter((post) => post.reports.length > 1);
+      const spamPosts = await Posts.find({
+        $expr: { $gt: [{ $size: { $ifNull: ["$reports", []] } }, 1] }
+      })
+      .select("user createdAt reports content")
+      .populate({ path: "user", select: "username avatar email" });
       
       res.json({ spamPosts });
     } catch (err) {
@@ -77,7 +78,9 @@ const adminCtrl = {
         _id: req.params.id,
       });
 
-      await Comments.deleteMany({ _id: { $in: post.comments } });
+      if (post && post.comments && post.comments.length > 0) {
+        await Comments.deleteMany({ _id: { $in: post.comments } });
+      }
 
       res.json({ msg: "Post deleted successfully." });
     } catch (err) {

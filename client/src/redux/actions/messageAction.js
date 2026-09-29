@@ -1,7 +1,6 @@
 import { GLOBALTYPES } from "./globalTypes";
 import { postDataAPI, getDataAPI } from "../../utils/fetchData";
 
-
 export const MESSAGE_TYPES = {
   ADD_USER: "ADD_USER",
   ADD_MESSAGE: "ADD_MESSAGE",
@@ -16,19 +15,21 @@ export const addUser = ({ user, message }) => async (dispatch) => {
 };
 
 export const addMessage = ({ msg, auth, socket }) => async (dispatch) => {
-
   dispatch({type: MESSAGE_TYPES.ADD_MESSAGE, payload: msg});
-  socket.emit('addMessage', msg);
+  
+  if (socket && typeof socket.emit === 'function') {
+    socket.emit('addMessage', msg);
+  }
 
   try {
     await postDataAPI('message', msg, auth.token)
   } catch (err) {
-    dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg } });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message } });
   }
 }
 
 export const getConversations = ({auth, page = 1 }) => async (dispatch) => {
-try {
+  try {
     const res = await getDataAPI(`conversations?limit=${page * 9}`, auth.token);
     let newArr = [];
     res.data.conversations.forEach(item => {
@@ -41,22 +42,18 @@ try {
 
     dispatch({ type: MESSAGE_TYPES.GET_CONVERSATIONS, payload: {newArr, result: res.data.result} });
   } catch (err) {
-    dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg } });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message } });
   }
-
 }
-
-
 
 export const getMessages = ({ auth, id, page = 1 }) => async (dispatch) => {
   try {
     const res = await getDataAPI(`message/${id}?limit=${page * 9}`, auth.token);
-
     dispatch({ type: MESSAGE_TYPES.GET_MESSAGES, payload: res.data });
   } catch (err) {
     dispatch({
       type: GLOBALTYPES.ALERT,
-      payload: { error: err.response.data.msg },
+      payload: { error: err.response?.data?.msg || err.message },
     });
   }
 };

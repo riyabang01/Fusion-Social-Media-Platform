@@ -1,89 +1,49 @@
-/* #region Comment input */
-
-.comment_input{
-    display: flex;
-    align-items: center;
-}
-
-.comment_input input{
-    background: #f7f7f7;
-    border: none;
-    outline: none;
-    flex: 1;
-    overflow: auto;
-}
-
-.comment_input .postBtn{
-    border: none;
-    outline: none;
-    background: #f7f7f7;
-    font-weight: 600;
-    color: crimson;
-}
-
-
-/* #endregion */
-
-
-/* #region Comment display */
-.comment_display{
-    padding: 10px 25px;
-
-}
-
-.comment_card .comment_content{
-    background: #eee;
-    padding: 7px;
-    border-radius: 10px;
-    border-top-left-radius: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-}
-
-.comment_card .comment_content .readMore{
-    cursor: pointer;
-    color: crimson;
-}
-
-.comment_card .comment_content .nav-item {
-    cursor: pointer;
-    opacity: 0;
-}
-
-.comment_card .comment_content:hover .nav-item{
-    opacity: 1;
-}
-
-.comment_card .comment_content .dropdown-menu{
-    position: absolute;
-    right: 0;
-    left: inherit !important;
-}
-
-.comment_card .comment_content .dropdown-item{
-    display: flex;
-    margin: 10px ;
-    width: inherit;
-}
-
-.comment_card .comment_content .dropdown-item:hover{
-    background: var(--pink);
-}
-
-.comment_card .comment_content textarea{
-    border: none;
-    outline: none;
+.comments {
     width: 100%;
-    background: #eee;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* #endregion */
+.comment_display {
+    transition: border-color 0.15s ease-in-out;
+}
 
+.comment_content {
+    background-color: #f8fafc;
+    transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
 
+.comment_content:hover {
+    background-color: #f1f5f9;
+}
 
+.comment_content textarea:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
 
+.comment_card .comment_menu {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
+}
 
+.comment_card:hover .comment_menu {
+    opacity: 1;
+    visibility: visible;
+}
 
+.comment_menu .dropdown-menu {
+    transform-origin: top right;
+    animation: commentMenuFadeIn 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
 
+@keyframes commentMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}

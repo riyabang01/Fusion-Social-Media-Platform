@@ -1,7 +1,6 @@
 const Conversations = require('../models/conversationModel');
 const Messages = require('../models/messageModel');
 
-
 class APIfeatures {
   constructor(query, queryString) {
     this.query = query;
@@ -17,19 +16,17 @@ class APIfeatures {
   }
 }
 
-
 const messageCtrl = {
   createMessage: async (req, res) => {
     try {
       const { recipient, text, media } = req.body;
-      if (!recipient || (!text.trim() && media.length === 0)) return;
+      if (!recipient || (!text.trim() && (!media || media.length === 0))) {
+        return res.status(400).json({ msg: "Payload matrix fields incomplete." });
+      }
 
       const newConversation = await Conversations.findOneAndUpdate(
         {
-          $or: [
-            { recipients: [req.user._id, recipient] },
-            { recipients: [recipient, req.user._id] },
-          ],
+          recipients: { $all: [req.user._id, recipient] }
         },
         {
           recipients: [req.user._id, recipient],
@@ -49,7 +46,7 @@ const messageCtrl = {
 
       await newMessage.save();
 
-      res.json({ msg: "Created." });
+      res.json({ msg: "Message transmitted successfully." });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

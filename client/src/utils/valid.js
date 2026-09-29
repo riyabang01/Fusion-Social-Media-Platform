@@ -15,12 +15,17 @@ const valid = ({ fullname, username, email, password, cf_password }) => {
 
     if (!email) {
       err.email = "Please add Email.";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        err.email = "Invalid email format.";
+      }
     }
 
     if (!password) {
       err.password = "Please add Password.";
     } else if (password.length < 6) {
-      err.password = "Password must be al least 6 characters long.";
+      err.password = "Password must be at least 6 characters long.";
     }
 
     if (password !== cf_password) {

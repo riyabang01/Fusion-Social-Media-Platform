@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { updateProfileUser } from "../../redux/actions/profileAction";
-
 import { checkImage } from "../../utils/imageUpload";
 
 const EditProfile = ({ setOnEdit }) => {
@@ -44,133 +43,135 @@ const EditProfile = ({ setOnEdit }) => {
   };
 
   return (
-    <div className="edit_profile">
-      <button
-        className="btn btn-danger btn_close"
-        onClick={() => setOnEdit(false)}
-      >
-        Close
-      </button>
-
-      <form onSubmit={handleSubmit}>
-        <div className="info_avatar">
-          <img
-            alt="profile"
-            src={avatar ? URL.createObjectURL(avatar) : auth.user.avatar}
-            style={{ filter: theme ? "invert(1)" : "invert(0)" }}
-          />
-          <span>
-            <i className="fas fa-camera" />
-            <p>Change</p>
-            <input
-              type="file"
-              name="file"
-              id="file_up"
-              accept="image/*"
-              onChange={changeAvatar}
-            />
+    <div className="edit_profile_modal d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100" style={{ background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)", zIndex: 99999 }}>
+      <div className="bg-white rounded-4 shadow-lg border border-light-subtle p-4 position-relative w-100 overflow-hidden" style={{ maxWidth: "500px", maxHeight: "90vh" }}>
+        
+        <div className="edit_profile_header d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+          <h6 className="m-0 fw-bold text-dark text-uppercase tracking-wider small">Account Configurations</h6>
+          <span 
+            className="fs-4 text-secondary cursor-pointer close_btn_layer" 
+            onClick={() => setOnEdit(false)}
+            style={{ cursor: "pointer", userSelect: "none", lineHeight: "1" }}
+          >
+            &times;
           </span>
         </div>
 
-        <div className="form_group">
-          <label htmlFor="fullname">Full Name</label>
-          <div className="position-relative">
+        <form onSubmit={handleSubmit} className="d-flex flex-column gap-3 overflow-y-auto px-1" style={{ maxHeight: "calc(90vh - 100px)" }}>
+          <div className="d-flex justify-content-center my-2">
+            <div className="info_avatar position-relative border border-light-subtle rounded-circle p-1 bg-white shadow-sm overflow-hidden" style={{ width: "120px", height: "120px" }}>
+              <img
+                alt="Profile Viewport"
+                src={avatar ? URL.createObjectURL(avatar) : auth.user.avatar}
+                style={{ filter: theme ? "invert(1)" : "invert(0)", objectFit: "cover" }}
+                className="w-100 h-100 rounded-circle"
+              />
+              <span className="position-absolute start-0 top-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center opacity-0 hover-opacity-100 transition-all text-white bg-dark bg-opacity-60 text-center" style={{ cursor: "pointer" }}>
+                <i className="fas fa-camera mb-1" />
+                <p className="m-0 small fw-medium">Modify</p>
+                <input
+                  type="file"
+                  name="file"
+                  id="file_up"
+                  accept="image/*"
+                  onChange={changeAvatar}
+                  style={{ position: "absolute", left: 0, top: 0, opacity: 0, width: "100%", height: "100%", cursor: "pointer" }}
+                />
+              </span>
+            </div>
+          </div>
+
+          <div className="form-group text-start">
+            <label htmlFor="fullname" className="form-label small fw-semibold text-secondary mb-1">Full Name</label>
+            <div className="position-relative">
+              <input
+                type="text"
+                className="form-control form-control-sm rounded-3 pr-5"
+                id="fullname"
+                name="fullname"
+                value={fullname}
+                onChange={handleInput}
+              />
+              <small
+                className="text-muted position-absolute end-0 top-50 translate-middle-y me-2"
+                style={{ fontSize: "0.75rem" }}
+              >
+                {fullname.length}/25
+              </small>
+            </div>
+          </div>
+
+          <div className="form-group text-start">
+            <label htmlFor="mobile" className="form-label small fw-semibold text-secondary mb-1">Mobile Contact</label>
             <input
               type="text"
-              className="form-control"
-              id="fullname"
-              name="fullname"
-              value={fullname}
+              className="form-control form-control-sm rounded-3"
+              id="mobile"
+              name="mobile"
+              value={mobile}
               onChange={handleInput}
             />
-            <small
-              className="text-danger position-absolute"
-              style={{
-                top: "50%",
-                right: "5px",
-                transform: "translateY(-50%)",
-              }}
-            >
-              {fullname.length}/25
+          </div>
+
+          <div className="form-group text-start">
+            <label htmlFor="address" className="form-label small fw-semibold text-secondary mb-1">Location Address</label>
+            <input
+              type="text"
+              className="form-control form-control-sm rounded-3"
+              id="address"
+              name="address"
+              value={address}
+              onChange={handleInput}
+            />
+          </div>
+
+          <div className="form-group text-start">
+            <label htmlFor="website" className="form-label small fw-semibold text-secondary mb-1">Website URL</label>
+            <input
+              type="text"
+              className="form-control form-control-sm rounded-3"
+              id="website"
+              name="website"
+              value={website}
+              onChange={handleInput}
+            />
+          </div>
+
+          <div className="form-group text-start">
+            <label htmlFor="story" className="form-label small fw-semibold text-secondary mb-1">Biography Story</label>
+            <textarea
+              rows="3"
+              className="form-control form-control-sm rounded-3"
+              id="story"
+              name="story"
+              value={story}
+              onChange={handleInput}
+              style={{ resize: "none" }}
+            />
+            <small className="text-muted d-block text-end mt-1" style={{ fontSize: "0.75rem" }}>
+              {story.length}/200
             </small>
           </div>
-        </div>
 
-        <div className="form_group">
-          <label htmlFor="mobile">Mobile</label>
+          <div className="form-group text-start mb-2">
+            <label htmlFor="gender" className="form-label small fw-semibold text-secondary mb-1">Gender Identification</label>
+            <select
+              className="form-select form-select-sm text-capitalize rounded-3"
+              name="gender"
+              id="gender"
+              onChange={handleInput}
+              value={gender}
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
 
-          <input
-            type="text"
-            className="form-control"
-            id="mobile"
-            name="mobile"
-            value={mobile}
-            onChange={handleInput}
-          />
-        </div>
-
-        <div className="form_group">
-          <label htmlFor="address">Address</label>
-
-          <input
-            type="text"
-            className="form-control"
-            id="address"
-            name="address"
-            value={address}
-            onChange={handleInput}
-          />
-        </div>
-
-        <div className="form_group">
-          <label htmlFor="website">Website</label>
-
-          <input
-            type="text"
-            className="form-control"
-            id="website"
-            name="website"
-            value={website}
-            onChange={handleInput}
-          />
-        </div>
-
-        <div className="form_group">
-          <label htmlFor="story">Story</label>
-
-          <textarea
-            cols="30"
-            rows="4"
-            type="text"
-            className="form-control"
-            id="story"
-            name="story"
-            value={story}
-            onChange={handleInput}
-          />
-
-          <small className="text-danger d-block text-right">
-            {story.length}/200
-          </small>
-        </div>
-
-        <label htmlFor="gender">Gender</label>
-        <div className="input-group-prepend px-0 mb-4">
-          <select
-            className="custom-select text-capitalize"
-            name="gender"
-            id="gender"
-            onChange={handleInput}
-            value={gender}
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-        <button className="btn btn-info w-100" type="submit">
-          Save
-        </button>
-      </form>
+          <button className="btn btn-sm btn-primary w-100 py-2 rounded-pill fw-semibold shadow-sm text-uppercase tracking-wider fs-7 mt-2" type="submit">
+            Apply Configuration Changes
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -15,7 +15,6 @@ const discoverReducer = (state = initialState, action) => {
         ...state,
         loading: action.payload,
       };
-
     case DISCOVER_TYPES.GET_POSTS:
       return {
         ...state,
@@ -23,7 +22,6 @@ const discoverReducer = (state = initialState, action) => {
         result: action.payload.result,
         firstLoad: true,
       };
-
     case DISCOVER_TYPES.UPDATE_POSTS:
       return {
         ...state,
@@ -31,7 +29,6 @@ const discoverReducer = (state = initialState, action) => {
         result: action.payload.result,
         page: state.page + 1,
       };
-
     default:
       return state;
   }

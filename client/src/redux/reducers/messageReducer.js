@@ -13,7 +13,7 @@ const messageReducer = (state = initialState, action) => {
     case MESSAGE_TYPES.ADD_USER:
       return {
         ...state,
-        users: [...state.data, action.payload],
+        users: [...state.users, action.payload],
       };
 
     case MESSAGE_TYPES.ADD_MESSAGE:

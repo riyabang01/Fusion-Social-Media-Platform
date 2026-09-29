@@ -20,7 +20,8 @@ const Saved = ({ auth, dispatch }) => {
         setLoad(false)
     })  
     .catch(err => {
-        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}})
+        setLoad(false);
+        dispatch({type: GLOBALTYPES.ALERT, payload: {error: err.response?.data?.msg || err.message}});
     })
 
     return () => setSavePosts([]);
@@ -35,21 +36,24 @@ const Saved = ({ auth, dispatch }) => {
     setLoad(false);
   };
 
-
   return (
-    <div>
+    <div className="saved_posts_container p-3 p-md-4 bg-white border border-light-subtle rounded-4 shadow-sm">
       <PostThumb posts={savePosts} result={result} />
 
       {load && (
-        <img src={LoadIcon} alt="Loading..." className="d-block mx-auto" />
+        <div className="d-flex justify-content-center my-4">
+          <img src={LoadIcon} alt="Loading..." width="40" />
+        </div>
       )}
 
-      <LoadMoreBtn
-        result={result}
-        page={page}
-        load={load}
-        handleLoadMore={handleLoadMore}
-      />
+      <div className="d-flex justify-content-center mt-3">
+        <LoadMoreBtn
+          result={result}
+          page={page}
+          load={load}
+          handleLoadMore={handleLoadMore}
+        />
+      </div>
     </div>
   );
 };

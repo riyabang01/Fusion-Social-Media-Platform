@@ -1,60 +1,60 @@
-
-
-
-.text-primary-p {
-  color: #a5aaad;
-  font-size: 14px;
-  font-weight: 700;
+.admin_dashboard_container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.font-bold {
-  font-weight: 700;
+.dashboard_view_content {
+    animation: adminWidgetSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.text-title {
-  color: #2e4a66;
+.tracking-tight {
+    letter-spacing: -0.02em !important;
 }
 
-.text-lightblue {
-  color: #469cac;
+.fs-7 {
+    font-size: 0.8rem !important;
 }
 
-.text-red {
-  color: #cc3d38;
+.bg-light-subtle {
+    background-color: #f8fafc !important;
 }
 
-.text-yellow {
-  color: #a98921;
+.max-w-xl {
+    max-width: 36rem !important;
 }
 
-.text-green {
-  color: #3b9668;
+.max-w-xs {
+    max-width: 20rem !important;
 }
 
-
-.container1 {
-  display: grid;
-  height: 100vh;
-  grid-template-columns: 0.8fr 1fr 1fr 1fr;
-  grid-template-rows: 0.2fr 3fr;
-  grid-template-areas:
-    "sidebar nav nav nav"
-    "sidebar main main main";
+.max-w-sm {
+    max-width: 24rem !important;
 }
 
-
-@media only screen and (max-width: 978px) {
-  .container1 {
-    grid-template-columns: 1fr;
-    grid-template-rows: 0.2fr 3fr;
-    grid-template-areas:
-      "nav"
-      "main";
-  }
+@keyframes adminWidgetSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-
-
-
-
-
+@media (max-width: 768px) {
+    .admin_dashboard_container .d-flex {
+        flex-direction: column !important;
+    }
+    
+    .admin_dashboard_container .flex-shrink-0 {
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        position: relative !important;
+        border-right: none !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+}

@@ -5,99 +5,144 @@ import { logout } from "../../redux/actions/authAction";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import Avatar from "../Avatar";
 import NotifyModal from "../NotifyModal";
+import HomeIcon from '@material-ui/icons/Home';
+import NearMeIcon from '@material-ui/icons/NearMe';
+import ExploreIcon from '@material-ui/icons/Explore';
+import NotificationsIcon from '@material-ui/icons/Notifications';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import Brightness7Icon from '@material-ui/icons/Brightness7';
+import Brightness4Icon from '@material-ui/icons/Brightness4';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 const Menu = () => {
-  const navLinks = [
-    { label: "Home", icon: "home", path: "/" },
-    { label: "Message", icon: "near_me", path: "/message" },
-    { label: "Discover", icon: "explore", path: "/discover" },
-  ];
-
   const { auth, theme, notify } = useSelector((state) => state);
+  
   const dispatch = useDispatch();
   const { pathname } = useLocation();
 
+  const navLinks = [
+    { label: "Home", icon: <HomeIcon style={{ color: theme ? "#ffffff" : "#1e293b" }} />, path: "/" },
+    { label: "Message", icon: <NearMeIcon style={{ color: theme ? "#ffffff" : "#1e293b" }} />, path: "/message" },
+    { label: "Discover", icon: <ExploreIcon style={{ color: theme ? "#ffffff" : "#1e293b" }} />, path: "/discover" },
+  ];
+
   const isActive = (pn) => {
-    if (pn === pathname) return "active";
+    return pn === pathname ? "active bg-primary bg-opacity-10 rounded-pill fw-semibold" : "";
   };
 
+  const handleThemeChange = () => {
+    const nextTheme = !theme;
+    dispatch({ type: GLOBALTYPES.THEME, payload: nextTheme });
+    if (nextTheme) {
+      document.body.classList.add("dark-theme-active");
+      document.body.style.backgroundColor = "#0f172a";
+      document.body.style.color = "#ffffff";
+    } else {
+      document.body.classList.remove("dark-theme-active");
+      document.body.style.backgroundColor = "#ffffff";
+      document.body.style.color = "#000000";
+    }
+  };
+
+  const hasUnread = notify?.data && notify.data.filter(item => !item.isRead).length > 0;
+  const unreadCount = notify?.data ? notify.data.filter(item => !item.isRead).length : 0;
+
   return (
-    <div className="menu">
-      <ul className="navbar-nav flex-row mb-2 mb-lg-0">
+    <div className="menu_navigation_panel">
+      <ul className="navbar-nav d-flex flex-row align-items-center mb-0 gap-3">
         {navLinks.map((link, index) => (
-          <li className={`nav-item px-2 ${isActive(link.path)}`} key={index}>
-            <Link className={`nav-link `} to={link.path}>
-              <span className={`material-icons `}>{link.icon}</span>
+          <li className={`nav-item ${isActive(link.path)} transition-all`} key={index}>
+            <Link className="nav-link d-flex align-items-center justify-content-center p-2.5" to={link.path} title={link.label}>
+              {link.icon}
             </Link>
           </li>
         ))}
 
-        <li className="nav-item dropdown" style={{ opacity: "1" }}>
+        <li className="nav-item dropdown">
           <span
-            className="nav-link position-relative"
-            id="navbarDropdown"
+            className="nav-link position-relative d-flex align-items-center justify-content-center p-2.5 transition-all hover-scale"
+            id="navbarDropdownNotify"
             role="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
+            style={{ cursor: "pointer", userSelect: "none" }}
           >
-            <span
-              style={{ color: notify.data.length > 0 ? "var(--c1)" : "" }}
-              className={`material-icons `}
-            >
-              notifications
-            </span>
-            <span className="notify_length">{notify.data.length}</span>
+            <NotificationsIcon 
+              style={{ color: hasUnread ? "#0d6efd" : (theme ? "#ffffff" : "#64748b") }} 
+            />
+            {unreadCount > 0 && (
+              <span 
+                className="position-absolute translate-middle badge rounded-circle bg-danger d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                style={{ top: "8px", left: "28px", fontSize: "0.68rem", minWidth: "16px", height: "16px", padding: "2px" }}
+              >
+                {unreadCount}
+              </span>
+            )}
           </span>
 
-          <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div 
+            className="dropdown-menu dropdown-menu-end shadow-lg border border-light-subtle rounded-4 p-0 mt-2 overflow-hidden bg-white animation-fade-in" 
+            aria-labelledby="navbarDropdownNotify"
+            style={{ zIndex: 1060 }}
+          >
             <NotifyModal />
           </div>
         </li>
 
-        <li className="nav-item dropdown" style={{ opacity: "1" }}>
+        <li className="nav-item dropdown">
           <span
-            className="nav-link dropdown-toggle"
-            id="navbarDropdown"
+            className="nav-link dropdown-toggle d-flex align-items-center p-0.5 border border-light-subtle rounded-circle bg-white shadow-sm transition-all hover-scale"
+            id="navbarDropdownUser"
             role="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
+            style={{ cursor: "pointer", userSelect: "none" }}
           >
-            <Avatar src={auth.user.avatar} size="medium-avatar" />
+            <Avatar src={auth?.user?.avatar} size="medium-avatar" />
           </span>
-          <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
+          
+          <ul 
+            className="dropdown-menu dropdown-menu-end shadow-lg border border-light-subtle rounded-4 bg-white mt-2 py-2 text-start" 
+            aria-labelledby="navbarDropdownUser"
+            style={{ minWidth: "190px", zIndex: 1060 }}
+          >
             <li>
               <Link
-                style={{ color: "white" }}
-                className="dropdown-item"
-                to={`/profile/${auth.user._id}`}
+                className="dropdown-item py-2.5 px-3 fw-semibold text-secondary d-flex align-items-center gap-2.5 hover-bg-light transition-all"
+                to={`/profile/${auth?.user?._id}`}
               >
-                Profile
+                <AccountCircleIcon style={{ fontSize: "20px", color: "#64748b" }} />
+                <span style={{ fontSize: "0.88rem" }}>View Profile</span>
               </Link>
             </li>
+            
             <li>
-              <label
-                style={{ color: "white" }}
-                htmlFor="theme"
-                className="dropdown-item"
-                onClick={() =>
-                  dispatch({ type: GLOBALTYPES.THEME, payload: !theme })
-                }
+              <div
+                className="dropdown-item py-2.5 px-3 fw-semibold text-secondary mb-0 d-flex align-items-center gap-2.5 hover-bg-light transition-all cursor-pointer"
+                style={{ cursor: "pointer", userSelect: "none" }}
+                onClick={handleThemeChange}
               >
-                {theme ? "Light mode" : "Dark mode"}
-              </label>
+                {theme ? (
+                  <Brightness7Icon style={{ fontSize: "20px", color: "#ffb703" }} />
+                ) : (
+                  <Brightness4Icon style={{ fontSize: "20px", color: "#64748b" }} />
+                )}
+                <span style={{ fontSize: "0.88rem" }}>{theme ? "Light Display" : "Dark Display"}</span>
+              </div>
             </li>
+            
             <li>
-              <hr className="dropdown-divider" />
+              <hr className="dropdown-divider my-1.5 border-light-subtle" />
             </li>
-
+            
             <li>
               <Link
-                style={{ color: "white" }}
-                className="dropdown-item"
+                className="dropdown-item py-2.5 px-3 fw-bold text-danger d-flex align-items-center gap-2.5 hover-bg-danger-subtle transition-all"
                 to="/"
                 onClick={() => dispatch(logout())}
               >
-                Logout
+                <ExitToAppIcon style={{ fontSize: "20px", color: "#dc3545" }} />
+                <span style={{ fontSize: "0.88rem" }}>Logout</span>
               </Link>
             </li>
           </ul>

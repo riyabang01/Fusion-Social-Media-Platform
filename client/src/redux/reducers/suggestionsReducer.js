@@ -12,13 +12,11 @@ const suggestionsReducer = (state = initialState, action) => {
         ...state,
         loading: action.payload,
       };
-
     case SUGGEST_TYPES.GET_USERS:
       return {
         ...state,
         users: action.payload.users,
       };
-
     default:
       return state;
   }

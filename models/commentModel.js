@@ -8,7 +8,11 @@ const commentSchema = new Schema(
       required: true,
     },
     tag: Object,
-    reply: mongoose.Types.ObjectId,
+   
+    reply: {
+      type: mongoose.Types.ObjectId,
+      ref: "comment"
+    },
     likes: [{ type: mongoose.Types.ObjectId, ref: "user" }],
     user: { type: mongoose.Types.ObjectId, ref: "user" },
     postId: mongoose.Types.ObjectId,
@@ -16,6 +20,8 @@ const commentSchema = new Schema(
   },
   {
     timestamps: true,
+
+    strictPopulate: false
   }
 );
 

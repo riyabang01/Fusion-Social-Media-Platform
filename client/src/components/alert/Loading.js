@@ -4,13 +4,13 @@ const Loading = () => {
   return (
     <div
       style={{
-        background: "white",
+        background: "rgba(255, 255, 255, 0.8)",
+        backdropFilter: "blur(4px)",
         top: 0,
         left: 0,
-        zIndex: 50,
-        opacity: 0.7
+        zIndex: 99999
       }}
-      className="position-fixed vh-100 w-100 d-flex justify-content-center align-items-center"
+      className="position-fixed vh-100 w-100 d-flex flex-column gap-3 justify-content-center align-items-center"
     >
       <div className="loading">
         <span></span>
@@ -19,8 +19,7 @@ const Loading = () => {
         <span></span>
       </div>
 
-      {/* Replace <text> with <span> */}
-      <span className="loading_text">
+      <span className="loading_text text-uppercase tracking-widest fw-semibold text-secondary small" style={{ letterSpacing: "0.12em", fontSize: "0.78rem" }}>
         Loading
       </span>
     </div>

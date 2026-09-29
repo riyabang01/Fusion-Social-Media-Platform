@@ -7,8 +7,7 @@ const initialState = {
   sound: false,
 }
 
-
-const authReducer = (state = initialState , action) => {
+const notifyReducer = (state = initialState , action) => {
   switch (action.type) {
     case NOTIFY_TYPES.GET_NOTIFIES:
       return {
@@ -54,4 +53,4 @@ const authReducer = (state = initialState , action) => {
   }
 };
 
-export default authReducer;
+export default notifyReducer;

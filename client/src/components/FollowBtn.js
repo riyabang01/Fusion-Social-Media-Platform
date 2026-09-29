@@ -3,11 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { follow, unfollow } from "../redux/actions/profileAction";
 
 const FollowBtn = ({user}) => {
-    const [ followed, setFollowed ] = useState(false);
-
+    const [followed, setFollowed] = useState(false);
     const { auth, profile, socket } = useSelector(state => state);
     const dispatch = useDispatch();
-
     const [load, setLoad] = useState(false);
 
     useEffect(() => {
@@ -19,7 +17,6 @@ const FollowBtn = ({user}) => {
 
     const handleFollow = async () => {
         if(load) return;
-
         setFollowed(true);
         setLoad(true);
         await dispatch(follow({ users: profile.users, user, auth, socket }));
@@ -28,22 +25,30 @@ const FollowBtn = ({user}) => {
 
     const handleUnFollow = async () => {
       if (load) return;
-
       setFollowed(false);
       setLoad(true);
       await dispatch(unfollow({ users: profile.users, user, auth, socket }));
       setLoad(false);
     };
 
-
     return (
       <>
         {followed ? (
-          <button className="btn-1 hover-in-shadow outer-shadow" onClick={handleUnFollow}>
-            Unfollow
+          <button 
+            className="btn btn-sm btn-outline-primary px-3 py-1.5 rounded-pill fw-medium transition-all shadow-sm" 
+            onClick={handleUnFollow}
+            disabled={load}
+            style={{ fontSize: "0.85rem", minWidth: "90px" }}
+          >
+            Following
           </button>
         ) : (
-          <button className="btn-1 hover-in-shadow outer-shadow" onClick={handleFollow}>
+          <button 
+            className="btn btn-sm btn-primary px-3 py-1.5 rounded-pill fw-semibold transition-all shadow-sm" 
+            onClick={handleFollow}
+            disabled={load}
+            style={{ fontSize: "0.85rem", minWidth: "90px" }}
+          >
             Follow
           </button>
         )}
@@ -51,4 +56,4 @@ const FollowBtn = ({user}) => {
     );
 }
 
-export default FollowBtn
+export default FollowBtn;
